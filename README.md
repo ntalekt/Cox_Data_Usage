@@ -43,6 +43,7 @@ sensor:
     value_template: '{{value_json.dumDaysLeft}}'
     scan_interval: 3600
 ```
+![Alt text](/img/HA_Example.JPG?raw=true)
 
 Required dependencies
 -----
