@@ -39,7 +39,7 @@ sensor:
   - platform: command_line
     name: Cox Days Left
     command: "python /home/pi/cox_usage.py"
-    unit_of_measurement: "%"
+    unit_of_measurement: "Days"
     value_template: '{{value_json.dumDaysLeft}}'
     scan_interval: 3600
 ```
