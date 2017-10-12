@@ -27,8 +27,9 @@ logged_in = br.submit()
 #Read the stats URL
 url_read = br.open(stats_url).read()
 soup = BeautifulSoup(url_read,"lxml") 
-#Grab the second script from the page with all the stats in it
-js = soup.findAll("script")[1].string
+#Grab the third script from the page with all the stats in it
+#Need to find a better way of finding the variable
+js = soup.findAll("script", type="text/javascript")[2].string
 #Split and RSplit on the first { and on the last } which is where the data object is located
 jsonValue = '{%s}' % (js.split('{', 1)[1].rsplit('}', 1)[0],)
 #Load into json
