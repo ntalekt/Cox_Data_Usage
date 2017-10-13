@@ -1,5 +1,13 @@
+#!/usr/bin/python
+# cox_usage.py
+# Script designed to get Cox Communications internet
+# usage data into a JSON format for Home Assistant.
+#
+# Version 1.0
+# Original Author : Rick Rocklin
+# Original Date   : 10/02/2017
+#
 import mechanize  
-import re
 from bs4 import BeautifulSoup
 import json
 
@@ -27,12 +35,13 @@ logged_in = br.submit()
 #Read the stats URL
 url_read = br.open(stats_url).read()
 soup = BeautifulSoup(url_read,"lxml") 
-#Grab the third script from the page with all the stats in it
-#Need to find a better way of finding the variable
-js = soup.findAll("script", type="text/javascript")[2].string
-#Split and RSplit on the first { and on the last } which is where the data object is located
-jsonValue = '{%s}' % (js.split('{', 1)[1].rsplit('}', 1)[0],)
-#Load into json
-value = json.loads(jsonValue)
-#Print pretty json
-print json.dumps(value, indent=4, sort_keys=True)
+#Grab the text/javascript scripts from the head of the stats page
+for scripts in soup.head.findAll("script", type="text/javascript"):
+    #Find if any of the scripts have variable we need
+    if scripts.text.find("var utag_data") != -1:
+        #Split and RSplit on the first { and on the last } which is where the data object is located
+        jsonValue = '{%s}' % (scripts.text.split('{', 1)[1].rsplit('}', 1)[0],)
+        #Load into json
+        value = json.loads(jsonValue)
+        #Print pretty json
+        print json.dumps(value, indent=4, sort_keys=True)
