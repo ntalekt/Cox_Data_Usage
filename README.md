@@ -1,6 +1,7 @@
 Cox_Data_Usage
 ==============
 Script designed to get Cox Communications data usage into a JSON format for Home Assisant.
+![Alt text](/img/HA_Example.JPG?raw=true)
 
 Configuration
 ---------
@@ -13,8 +14,6 @@ cox_user = "username"
 cox_pass = "password"
 json_file = "/home/homeassistant/.homeassistant/cox_usage.json"
 ```
-![Alt text](/img/HA_Example.JPG?raw=true)
-
 Automation
 -----
 ```
