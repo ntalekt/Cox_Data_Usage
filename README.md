@@ -4,46 +4,111 @@ Script designed to get Cox Communications data usage into a JSON format for Home
 
 Configuration
 ---------
-Modify the username and password variables to match your Cox main account.
+Modify the `username` and `password` variables to match your Cox main account. Update the `json_file` variable if required.
+
+Put `cox_usage.py` somewhere inside your Home Assistant configuration directory.
 
 ```
 cox_user = "username"
 cox_pass = "password"
+json_file = "/home/homeassistant/.homeassistant/cox_usage.json"
 ```
-
-Usage Examples
+![Alt text](/img/HA_Example.JPG?raw=true)
+Automation
+-----
+```
+automation:
+  - alias: Query Cox Data Usage
+    trigger:
+      platform: time
+      minutes: '/60'
+      seconds: 00
+    action:
+      service: shell_command.query_cox_data_usage
+```
+Shell Command Component
+-----
+```
+shell_command:
+  query_cox_data_usage: 'python /home/homeassistant/.homeassistant/cox_usage.py'
+```
+Sensor Component
 -----
 ```
 sensor:
-  - platform: command_line
-    name: Cox Usage
-    command: "python /home/pi/cox_usage.py"
-    unit_of_measurement: "GB"
-    value_template: '{{value_json.dumUsage}}'
-    scan_interval: 3600
-    
-  - platform: command_line
-    name: Cox Limit
-    command: "python /home/pi/cox_usage.py"
-    unit_of_measurement: "GB"
-    value_template: '{{value_json.dumLimit}}'
-    scan_interval: 3600
-    
-  - platform: command_line
+  - platform: file
     name: Cox Utilization
-    command: "python /home/pi/cox_usage.py"
-    unit_of_measurement: "%"
-    value_template: '{{value_json.dumUtilization}}'
-    scan_interval: 3600
-    
-  - platform: command_line
-    name: Cox Days Left
-    command: "python /home/pi/cox_usage.py"
-    unit_of_measurement: "Days"
-    value_template: '{{value_json.dumDaysLeft}}'
-    scan_interval: 3600
+    file_path: /home/homeassistant/.homeassistant/cox_usage.json
+    value_template: >
+      {% if value_json is defined %}
+        {% if value_json.dumUsage | int == 0 and value_json.dumLimit | int == 0 and value_json.dumUtilization | int == 0 %}
+          stats unavailable
+        {% else %}
+          {{ value_json.dumUsage | int }} / {{ value_json.dumLimit | int }} GB ({{ value_json.dumUtilization | int }} %)
+        {% endif %}
+      {% else %}
+        undefined
+      {% endif %}
+
+  - platform: file
+    name: Cox Time Left
+    file_path: /home/homeassistant/.homeassistant/cox_usage.json
+    value_template: >
+      {% if value_json is defined %}
+        {% if value_json.dumDaysLeft is defined %}
+          {{ value_json.dumDaysLeft | int }} Days
+        {% else %}
+          unknown
+        {% endif %}
+      {% else %}
+        undefined
+      {% endif %}
+      
+  - platform: file
+    name: Cox Avg GB Current
+    file_path: /home/homeassistant/.homeassistant/cox_usage.json
+    value_template: >
+      {% if value_json is defined %}
+        {% if value_json.dumUsage | int == 0 and value_json.dumDaysLeft | int == 0 %}
+          stats unavailable
+        {% else %}
+          {{ (float(value_json.dumUsage) / (30 - float(value_json.dumDaysLeft))) | round(1) }} GB per day
+        {% endif %}
+      {% else %}
+        undefined
+      {% endif %}
+      
+  - platform: file
+    name: Cox Avg GB Remaining
+    file_path: /home/homeassistant/.homeassistant/cox_usage.json
+    value_template: >
+      {% if value_json is defined %}
+        {% if value_json.dumLimit | int == 0 and value_json.dumUsage | int == 0 and value_json.dumDaysLeft | int == 0 %}
+          stats unavailable
+        {% else %}
+          {{ ((float(value_json.dumLimit) - float(value_json.dumUsage)) / float(value_json.dumDaysLeft)) | round(1) }} GB per day
+        {% endif %}
+      {% else %}
+        undefined
+      {% endif %}
 ```
-![Alt text](/img/HA_Example.JPG?raw=true)
+Customize
+-----
+```
+customize:
+    sensor.cox_utilization:
+      icon: mdi:percent
+      friendly_name: Utilization
+    sensor.cox_time_left:
+      icon: mdi:calendar-clock
+      friendly_name: Time Left
+    sensor.cox_avg_gb_current:
+      icon: mdi:chart-line
+      friendly_name: Current Daily Avg.
+    sensor.cox_avg_gb_remaining:
+      icon: mdi:chart-line-stacked
+      friendly_name: Remaining Daily Avg.
+```
 
 Required dependencies
 -----

@@ -7,6 +7,7 @@
 # Original Author : Rick Rocklin
 # Original Date   : 10/02/2017
 #
+# 10/17/2017: Output to file
 import mechanize  
 from bs4 import BeautifulSoup
 import json
@@ -18,6 +19,7 @@ stats_url = "https://www.cox.com/internet/mydatausage.cox"
 #Your cox user account (e.g. username@cox.net) and password
 cox_user = "username"
 cox_pass = "password"
+json_file = "/home/homeassistant/.homeassistant/cox_usage.json"
  
 br = mechanize.Browser()
 br.set_handle_robots(False)
@@ -43,5 +45,6 @@ for scripts in soup.head.findAll("script", type="text/javascript"):
         jsonValue = '{%s}' % (scripts.text.split('{', 1)[1].rsplit('}', 1)[0],)
         #Load into json
         value = json.loads(jsonValue)
-        #Print pretty json
-        print json.dumps(value, indent=4, sort_keys=True)
+        #Print JSON to file
+        with open(json_file, 'w+') as outfile:
+            json.dump(value, outfile, sort_keys=True)
