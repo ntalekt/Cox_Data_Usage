@@ -1,6 +1,6 @@
 Cox_Data_Usage
 ==============
-Python web scraper designed to return Cox Communications internet usage data for [Home Assisant](https://home-assistant.io/).
+Python web scraper designed to return Cox Communications internet usage data for [Home Assistant](https://home-assistant.io/).
 
 Home Assistant Card Example
 ---------
