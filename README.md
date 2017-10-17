@@ -1,6 +1,9 @@
 Cox_Data_Usage
 ==============
-Script designed to get Cox Communications data usage into a JSON format for Home Assisant.
+Python web scraper designed to return Cox Communications internet usage data for [Home Assisant](https://home-assistant.io/).
+
+Home Assistant Card Example
+---------
 ![Alt text](/img/HA_Example.JPG?raw=true)
 
 Configuration
