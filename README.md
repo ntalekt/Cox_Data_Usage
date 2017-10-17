@@ -39,6 +39,11 @@ Sensor Component
 -----
 ```
 sensor:
+  - platform: command_line
+    command: cal $(date +"%m %Y") | awk 'NF {DAYS = $NF}; END {print DAYS}'
+    name: Days In Current Month
+    scan_interval: 3600
+	
   - platform: file
     name: Cox Utilization
     file_path: /home/homeassistant/.homeassistant/cox_usage.json
@@ -74,8 +79,10 @@ sensor:
       {% if value_json is defined %}
         {% if value_json.dumUsage | int == 0 and value_json.dumDaysLeft | int == 0 %}
           stats unavailable
+        {% elif states.sensor.days_in_current_month.state is defined %}
+          {{ (float(value_json.dumUsage) / (float(states.sensor.days_in_current_month.state) - float(value_json.dumDaysLeft))) | round(1) }} GB per day
         {% else %}
-          {{ (float(value_json.dumUsage) / (30 - float(value_json.dumDaysLeft))) | round(1) }} GB per day
+          month_undefined
         {% endif %}
       {% else %}
         undefined
