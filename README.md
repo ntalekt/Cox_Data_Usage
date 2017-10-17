@@ -14,6 +14,7 @@ cox_pass = "password"
 json_file = "/home/homeassistant/.homeassistant/cox_usage.json"
 ```
 ![Alt text](/img/HA_Example.JPG?raw=true)
+
 Automation
 -----
 ```
