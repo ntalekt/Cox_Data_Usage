@@ -40,10 +40,10 @@ Sensor Component
 ```
 sensor:
   - platform: command_line
-    command: cal $(date +"%m %Y") | awk 'NF {DAYS = $NF}; END {print DAYS}'
+    command: cal -h $(date +"%m %Y") | awk 'NF {DAYS = $NF}; END {print DAYS}'
     name: Days In Current Month
     scan_interval: 3600
-	
+
   - platform: file
     name: Cox Utilization
     file_path: /home/homeassistant/.homeassistant/cox_usage.json
@@ -71,7 +71,7 @@ sensor:
       {% else %}
         undefined
       {% endif %}
-      
+
   - platform: file
     name: Cox Avg GB Current
     file_path: /home/homeassistant/.homeassistant/cox_usage.json
@@ -87,7 +87,7 @@ sensor:
       {% else %}
         undefined
       {% endif %}
-      
+
   - platform: file
     name: Cox Avg GB Remaining
     file_path: /home/homeassistant/.homeassistant/cox_usage.json
