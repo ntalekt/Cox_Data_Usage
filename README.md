@@ -123,6 +123,5 @@ customize:
 Required dependencies
 -----
 ```
-sudo pip install BeautifulSoup
-sudo pip install mechanize
+pip install MechanicalSoup
 ```

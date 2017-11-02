@@ -8,43 +8,55 @@
 # Original Date   : 10/02/2017
 #
 # 10/17/2017: Output to file
-import mechanize  
-from bs4 import BeautifulSoup
+# 11/02/2017: Updated to use mechanicalsoup
+import mechanicalsoup
+import re
 import json
 
-#URL that we authenticate against
+# URL that we authenticate against
 login_url = "https://www.cox.com/resaccount/sign-in.cox"
-#URL that we grab all the data from
+# URL that we grab all the data from
 stats_url = "https://www.cox.com/internet/mydatausage.cox"
-#Your cox user account (e.g. username@cox.net) and password
+# Your cox user account (e.g. username@cox.net) and password
 cox_user = "username"
 cox_pass = "password"
 json_file = "/home/homeassistant/.homeassistant/cox_usage.json"
- 
-br = mechanize.Browser()
-br.set_handle_robots(False)
-br.addheaders = [("User-agent","Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.2.13) Gecko/20101206 Ubuntu/10.10 (maverick) Firefox/3.6.13")]
-#Open the login URL
-sign_in = br.open(login_url)
-#Find the form named sign-in
-br.select_form(name = "sign-in")
-#Set the username 
-br["username"] = cox_user
-#Set the password 
-br["password"] = cox_pass
-#Submit the form
-logged_in = br.submit()    
-#Read the stats URL
-url_read = br.open(stats_url).read()
-soup = BeautifulSoup(url_read,"lxml") 
-#Grab the text/javascript scripts from the head of the stats page
-for scripts in soup.head.findAll("script", type="text/javascript"):
-    #Find if any of the scripts have variable we need
-    if scripts.text.find("var utag_data") != -1:
-        #Split and RSplit on the first { and on the last } which is where the data object is located
-        jsonValue = '{%s}' % (scripts.text.split('{', 1)[1].rsplit('}', 1)[0],)
-        #Load into json
-        value = json.loads(jsonValue)
-        #Print JSON to file
-        with open(json_file, 'w+') as outfile:
-            json.dump(value, outfile, sort_keys=True)
+
+# Setup browser
+browser = mechanicalsoup.StatefulBrowser(
+    soup_config={'features': 'lxml'},
+    user_agent='Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.2.13) Gecko/20101206 Ubuntu/10.10 (maverick) Firefox/3.6.13',
+)
+
+# Open the login URL
+login_page = browser.get(login_url)
+
+# Similar to assert login_page.ok but with full status code in case of failure.
+login_page.raise_for_status()
+
+# Find the form named sign-in
+login_form = mechanicalsoup.Form(
+    login_page.soup.select_one('form[name="sign-in"]'))
+
+# Specify username and password
+login_form.input({'username': cox_user, 'password': cox_pass})
+
+# Submit the form
+browser.submit(login_form, login_page.url)
+
+# Read the stats URL
+stats_page = browser.get(stats_url)
+
+# Grab the script with the stats in it
+stats = stats_page.soup.findAll(
+    'script', string=re.compile('utag_data'))[0].string
+
+# Split and RSplit on the first { and on the last } which is where the data object is located
+jsonValue = '{%s}' % (stats.split('{', 1)[1].rsplit('}', 1)[0],)
+
+# Load into json
+data = json.loads(jsonValue)
+
+# Print JSON to file
+with open(json_file, 'w+') as outfile:
+    json.dump(data, outfile, sort_keys=True)
