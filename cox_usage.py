@@ -28,6 +28,9 @@ browser = mechanicalsoup.StatefulBrowser(
     user_agent='Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.2.13) Gecko/20101206 Ubuntu/10.10 (maverick) Firefox/3.6.13',
 )
 
+#Disable SSL verification workaround for issue #2
+browser.session.verify = False
+
 # Open the login URL
 login_page = browser.get(login_url)
 
