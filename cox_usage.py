@@ -12,6 +12,7 @@
 import mechanicalsoup
 import re
 import json
+import os
 
 # URL that we authenticate against
 login_url = "https://www.cox.com/resaccount/sign-in.cox"
@@ -20,7 +21,8 @@ stats_url = "https://www.cox.com/internet/mydatausage.cox"
 # Your cox user account (e.g. username@cox.net) and password
 cox_user = "username"
 cox_pass = "password"
-json_file = "/home/homeassistant/.homeassistant/cox_usage.json"
+home = os.getenv('HOME', '/home/homeassistant')
+json_file = f"{home}/.homeassistant/cox_usage.json"
 
 # Setup browser
 browser = mechanicalsoup.StatefulBrowser(
