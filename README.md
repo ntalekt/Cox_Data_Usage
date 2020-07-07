@@ -1,4 +1,4 @@
-**Deprecated** Please use: https://github.com/ntalekt/coxusage-docker
+**Deprecated** Please use: https://github.com/ntalekt/coxusage-docker or https://github.com/dejanzelic/coxusage-docker
 
 Cox_Data_Usage
 ==============
