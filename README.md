@@ -1,3 +1,5 @@
+**Deprecated** Please use: https://github.com/ntalekt/coxusage-docker
+
 Cox_Data_Usage
 ==============
 Python web scraper designed to return Cox Communications internet usage data for [Home Assistant](https://home-assistant.io/).
